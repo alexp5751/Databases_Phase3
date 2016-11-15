@@ -1,0 +1,42 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    background: url(/images/background.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+#main-container {
+    height: 100%;
+}
+
+#view {
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    max-height: 500px;
+    width: 500px;
+    display: flex;
+    align-items: center;
+}
+
+#login-form {
+    margin: 0;
+    width: 100%;
+}
+
+.inner-form {
+    margin: 10px;
+}
+
+.form-control {
+    margin-bottom: 10px;
+}
+
+.full-width {
+    width: 100%;
+}

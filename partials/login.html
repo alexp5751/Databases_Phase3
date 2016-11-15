@@ -1,0 +1,7 @@
+<div id="login-form" class="panel" ng-controller="LoginController">
+    <form class="inner-form" name="loginForm" ng-submit="login(credentials)" novalidate>
+        <input class="form-control" placeholder="Username" type="text" id="username" ng-model="credentials.username">
+        <input class="form-control" placeholder="Password" type="password" id="password" ng-model="credentials.password">
+        <button class="btn full-width" type="submit">Login</button>
+    </form>
+</div>
