@@ -1,5 +1,5 @@
 define(['./module'], function (directives) {
-    directives.directive('uniqueUsername', function($q, $timeout) {
+    directives.directive('uniqueUsername', function($q, API) {
         return {
             require: 'ngModel',
             link: function(scope, elm, attrs, ctrl) {
@@ -9,14 +9,15 @@ define(['./module'], function (directives) {
                     }
 
                     var def = $q.defer();
-                    // Replace with http to check username validity
-                    $timeout(function() {
-                        if (modelValue != 'Link') {
-                            def.resolve();
+                    API.getUserByUsername(modelValue).then(function (res) {
+                        if (res.data.length > 0) {
+                            def.reject('Username already exists.')
                         } else {
-                            def.reject();
+                            def.resolve(res);
                         }
-                    }, 1000);
+                    }, function (err) {
+                        def.reject(err);
+                    });
                     return def.promise;
                 };
             }

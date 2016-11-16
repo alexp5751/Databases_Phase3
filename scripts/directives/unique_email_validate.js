@@ -1,5 +1,5 @@
 define(['./module'], function (directives) {
-    directives.directive('uniqueEmail', function($q, $timeout) {
+    directives.directive('uniqueEmail', function($q, API) {
         return {
             require: 'ngModel',
             link: function(scope, elm, attrs, ctrl) {
@@ -9,14 +9,15 @@ define(['./module'], function (directives) {
                     }
 
                     var def = $q.defer();
-                    // Replace with http to check email validity
-                    $timeout(function() {
-                        if (modelValue != 'apoole32@gatech.edu') {
-                            def.resolve();
-                        } else {
-                            def.reject();
-                        }
-                    }, 1000);
+                    API.getUserByEmail(modelValue).then(function (res) {
+                      if (res.data.length > 0) {
+                          def.reject('Email already exists.')
+                      } else {
+                          def.resolve(res);
+                      }
+                    }, function (err) {
+                      def.reject(err);
+                    });
                     return def.promise;
                 };
             }

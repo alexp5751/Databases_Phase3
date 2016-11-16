@@ -1,0 +1,55 @@
+<div class="lg-inner-container panel" ng-controller="MainController">
+    <form class="inner-form" name="searchForm" ng-submit="search(params)" autocomplete="new-password" novalidate>
+        <h2 class="title">Main Page</h2>
+        <a class="right" ui-sref="me">Me</a>
+        <input class="form-control" placeholder="Title" type="text" name="title" ng-model="params.title"/>
+        <div class="btn-group" uib-dropdown is-open="false">
+            <button id="single-button" type="button" class="btn full-width" uib-dropdown-toggle ng-disabled="disabled">
+                Designation <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+            </ul>
+        </div>
+        <div class="btn-group" uib-dropdown is-open="false">
+            <button id="single-button" type="button" class="btn full-width" uib-dropdown-toggle ng-disabled="disabled">
+                Major <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+            </ul>
+        </div>
+        <div class="btn-group" uib-dropdown is-open="false">
+            <button id="single-button" type="button" class="btn full-width" uib-dropdown-toggle ng-disabled="disabled">
+                Year <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+            </ul>
+        </div>
+        <div class="btn-group" uib-dropdown is-open="false">
+            <button id="single-button" type="button" class="btn full-width" uib-dropdown-toggle ng-disabled="disabled">
+                Category <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+                <li role="menuitem"><a href>A</a></li>
+            </ul>
+        </div>
+        <div class="results-table">
+            <a ui-sref="project_details">Project Details</a>
+            <a ui-sref="course_details">Course Details</a>
+        </div>
+    </form>
+</div>
