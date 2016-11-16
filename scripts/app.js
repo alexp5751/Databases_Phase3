@@ -19,5 +19,6 @@ define([
         'ui.bootstrap',
         'app.controllers',
         'app.services',
+	    	'app.directives'
 	])
 });

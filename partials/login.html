@@ -1,7 +1,17 @@
-<div id="login-form" class="panel" ng-controller="LoginController">
-    <form class="inner-form" name="loginForm" ng-submit="login(credentials)" novalidate>
-        <input class="form-control" placeholder="Username" type="text" id="username" ng-model="credentials.username">
-        <input class="form-control" placeholder="Password" type="password" id="password" ng-model="credentials.password">
-        <button class="btn full-width" type="submit">Login</button>
+<div class="inner-container panel" ng-controller="LoginController">
+    <form class="inner-form" name="loginForm" ng-submit="login(credentials)" autocomplete="new-password" novalidate>
+        <h2>Log In</h2>
+        <div class="validators">
+            <p class="alert alert-danger" ng-show="loginForm.username.$touched && loginForm.username.$error.required">Username is required.</p>
+        </div>
+        <input class="form-control" placeholder="Username" type="text" name="username" ng-model="credentials.username" ng-required="true"/>
+        <div class="validators">
+            <p class="alert alert-danger" ng-show="loginForm.password.$touched && loginForm.password.$error.required">Password is required.</p>
+        </div>
+        <input class="form-control" placeholder="Password" type="password" name="password" ng-model="credentials.password" ng-required="true"/>
+        <button class="btn full-width" type="submit" ng-disabled="!loginForm.$valid">Login</button>
+        <div class="return-link-container">
+            <a class="return-link" ui-sref="register">New here? Click here to create a new account.</a>
+        </div>
     </form>
 </div>

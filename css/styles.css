@@ -18,13 +18,13 @@ body {
     margin: auto;
     position: absolute;
     top: 0; left: 0; bottom: 0; right: 0;
-    max-height: 500px;
+    max-height: 100%;
     width: 500px;
     display: flex;
     align-items: center;
 }
 
-#login-form {
+.inner-container {
     margin: 0;
     width: 100%;
 }
@@ -39,4 +39,36 @@ body {
 
 .full-width {
     width: 100%;
+}
+
+.return-link-container {
+    display: flex;
+    align-items: center;
+}
+
+.return-link {
+    max-width: 100%;
+    margin: 10px auto 0 auto;
+}
+
+.alert {
+    margin-bottom: 10px;
+    padding: 6px 12px;
+}
+
+.text-success {
+    color: #3c763d;
+}
+
+.text-error {
+    color: #a94442;
+}
+
+.text-warning {
+    color: #8a6d3b;
+}
+
+.validators {
+    max-height: 44px;
+    overflow-y: hidden;
 }
