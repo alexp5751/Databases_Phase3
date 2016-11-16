@@ -12,3 +12,4 @@
 10. Once again, test the app at <http://localhost:8080>. This time, things that are connected to the database should function properly (which is currently only login and register).
 11. Do a jig.
 12. Stay in school, kids.
+13. Winning.
