@@ -22,7 +22,6 @@ define(['./module'], function(controllers) {
         }
 
         $scope.editProfile = function() {
-            console.log($scope.user);
             API.updateUser($scope.user).then(function(res) {
                 // Give visual feedback
             });

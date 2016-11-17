@@ -167,3 +167,22 @@ h2 {
 .profile-field {
     margin-bottom: 0;
 }
+
+.apply-button {
+  margin-top: 10px;
+}
+
+.apply-success {
+    margin-top: 10px;
+}
+
+.already-applied {
+    margin-top: 10px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+hr {
+    margin: 0;
+    border-color: #ddd;
+}

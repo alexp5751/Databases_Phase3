@@ -1,4 +1,4 @@
-define(['./module'], function (controllers) {
+define(['./module'], function(controllers) {
     controllers.controller('RegisterController', function($scope, $state, API, User) {
         $scope.successMessage = '';
         $scope.successClass = '';
@@ -9,7 +9,7 @@ define(['./module'], function (controllers) {
             'confirmPassword': ''
         }
 
-        $scope.register = function (credentials) {
+        $scope.register = function(credentials) {
             $scope.successMessage = 'Attempting to create new user...';
             $scope.successClass = 'alert alert-warning';
             API.register(credentials).then(function(res) {
@@ -19,9 +19,14 @@ define(['./module'], function (controllers) {
                     Username: credentials.username
                 });
                 $state.go('main');
-            }, function (err) {
-                $scope.successMessage = 'Failed to create new user.';
-                $scope.successClass = 'alert alert-danger';
+            }, function(err) {
+                if (err.status == 409) {
+                    $scope.successMessage = 'User with this username or email already exists.';
+                    $scope.successClass = 'alert alert-danger';
+                } else {
+                    $scope.successMessage = 'Failed to create new user.';
+                    $scope.successClass = 'alert alert-danger';
+                }
             });
         }
     });

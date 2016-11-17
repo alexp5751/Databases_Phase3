@@ -39,6 +39,14 @@
                 </tbody>
             </table>
         </div>
+        <div ng-switch="alreadyApplied">
+            <div ng-switch-when="false">
+                <button ng-hide="applyButtonHide" class="btn btn-default full-width apply-button" ng-click="apply()">Apply For Project</button>
+                <p ng-show="successMessage" class="{{ 'apply-success ' + successClass }}">{{ successMessage }}</p>
+            </div>
+            <p ng-switch-when="true" class="already-applied alert alert-info">You have already applied for this project.</p>
+            <p ng-switch-when="true" class="already-applied alert" ng-class="{'alert-success': status == 'Accepted', 'alert-warning': status == 'Pending', 'alert-danger': status == 'Rejected'}">Application Status: {{ status }}</p>
+        </div>
         <div class="return-link-container">
             <a class="return-link" ui-sref="main">Return to Main</a>
         </div>

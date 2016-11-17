@@ -1,5 +1,31 @@
 define(['./module'], function(services) {
     services.factory('API', function($http, $q) {
+        function getDateTime() {
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth() + 1;
+            var day = now.getDate();
+            var hour = now.getHours();
+            var minute = now.getMinutes();
+            var second = now.getSeconds();
+            if (month.toString().length == 1) {
+                var month = '0' + month;
+            }
+            if (day.toString().length == 1) {
+                var day = '0' + day;
+            }
+            if (hour.toString().length == 1) {
+                var hour = '0' + hour;
+            }
+            if (minute.toString().length == 1) {
+                var minute = '0' + minute;
+            }
+            if (second.toString().length == 1) {
+                var second = '0' + second;
+            }
+            var dateTime = year + '/' + month + '/' + day + ' ' + hour + ':' + minute + ':' + second;
+            return dateTime;
+        }
         return {
             login: function(credentials) {
                 var def = $q.defer();
@@ -120,6 +146,38 @@ define(['./module'], function(services) {
             getDepartmentByMajor: function(major) {
                 var def = $q.defer();
                 $http.get('http://localhost:8000/department/' + major).then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getApplicationByUsernameAndProjectName(username, projectName) {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/application/' + username + '/' + projectName).then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getApplicationsByUsername(username) {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/application/' + username).then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            applyForProject: function(username, projectName) {
+                var def = $q.defer();
+                $http.post('http://localhost:8000/application/create', {
+                    Username: username,
+                    ProjectName: projectName,
+                    Date: getDateTime(),
+                    Status: 'Pending'
+                }).then(function(res) {
                     def.resolve(res);
                 }, function(err) {
                     def.reject(err);

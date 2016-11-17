@@ -242,6 +242,40 @@ app.get('/project/requirements/:projectName', function(req, res) {
     });
 });
 
+app.post('/application/create', function(req, res) {
+    db.safe_query('INSERT INTO Application SET ?', req.body, function(err, result) {
+        if (err && err.errno == 1062) {
+            res.status(409).send(err);
+        } else if (err) {
+            res.status(400).send(err);
+        } else {
+            res.send({
+                success: true
+            });
+        }
+    });
+});
+
+app.get('/application/:username', function(req, res) {
+    db.safe_query('SELECT * FROM Application WHERE Username = ?', [req.params.username], function(err, result) {
+        if (err) {
+            res.status(400).send(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
+app.get('/application/:username/:projectName', function(req, res) {
+    db.safe_query('SELECT * FROM Application WHERE Username = ? AND ProjectName = ?', [req.params.username, req.params.projectName], function(err, result) {
+        if (err) {
+            res.status(400).send(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
 var server = app.listen(8000, function() {
     console.log('Server listening on port ' + server.address().port);
 });
