@@ -25,7 +25,9 @@ define(['./module'], function(controllers) {
 
                 API.getApplicationByUsernameAndProjectName($scope.username, name).then(function(res) {
                     $scope.alreadyApplied = res.data.length == 1;
-                    $scope.status = res.data[0].Status;
+                    if ($scope.alreadyApplied) {
+                        $scope.status = res.data[0].Status;
+                    }
                 });
             }
         });
