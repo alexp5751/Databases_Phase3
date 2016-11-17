@@ -1,5 +1,5 @@
 define(['./module'], function (controllers) {
-    controllers.controller('LoginController', function($scope, $state, API) {
+    controllers.controller('LoginController', function($scope, $state, API, User) {
         $scope.authMessage = '';
         $scope.authClass = '';
         $scope.credentials = {
@@ -13,6 +13,9 @@ define(['./module'], function (controllers) {
             API.login(credentials).then(function(res) {
                 $scope.authClass = 'alert alert-success';
                 $scope.authMessage = 'Successfully logged in.';
+                User.setUser({
+                    Username: credentials.username
+                });
                 $state.go('main');
             }, function (err) {
                 if (err.status == 401) {

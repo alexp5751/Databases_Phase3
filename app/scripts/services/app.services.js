@@ -1,3 +1,4 @@
 define([
-    './api'
+    './api',
+    './user'
 ], function () {});

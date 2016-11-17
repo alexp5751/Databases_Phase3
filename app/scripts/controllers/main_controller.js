@@ -1,15 +1,17 @@
-define(['./module'], function (controllers) {
-    controllers.controller('MainController', function($scope, $http, $q, API) {
-        $scope.params = {
-
+define(['./module'], function(controllers) {
+    controllers.controller('MainController', function($scope, API, User) {
+        if (!User.getUser()) {
+            $state.go('login');
+        } else {
+            $scope.username = User.getUser().Username;
         }
 
-        $scope.search = function (params) {
-            console.log("Results!");
-        }
+        API.getProjectsAndCourses().then(function(res) {
+            $scope.items = res.data;
+        });
 
-        $scope.print = function () {
-            console.log('Hello!');
+        $scope.getState = function(name, type) {
+            return '/' + type.toLowerCase() + '/' + name;
         }
     });
-})
+});

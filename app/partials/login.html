@@ -5,11 +5,11 @@
         <div class="validators">
             <p class="alert alert-danger" ng-show="loginForm.username.$touched && loginForm.username.$error.required">Username is required.</p>
         </div>
-        <input class="form-control" placeholder="Username" type="text" name="username" ng-model="credentials.username" ng-required="true"/>
+        <input class="form-control" placeholder="Username" type="text" name="username" ng-model="credentials.username" ng-required="true" />
         <div class="validators">
             <p class="alert alert-danger" ng-show="loginForm.password.$touched && loginForm.password.$error.required">Password is required.</p>
         </div>
-        <input class="form-control" placeholder="Password" type="password" name="password" ng-model="credentials.password" ng-required="true"/>
+        <input class="form-control" placeholder="Password" type="password" name="password" ng-model="credentials.password" ng-required="true" />
         <button class="btn full-width" type="submit" ng-disabled="pending || !loginForm.$valid">Login</button>
         <div class="return-link-container">
             <a class="return-link" ui-sref="register">New here? Click here to create a new account.</a>

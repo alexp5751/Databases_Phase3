@@ -17,7 +17,10 @@ body {
 #view {
     margin: auto;
     position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     max-height: 100%;
     width: 800px;
     display: flex;
@@ -27,16 +30,18 @@ body {
 .sm-inner-container {
     margin: 0 auto;
     width: 60%;
+    position: relative;
 }
 
 .lg-inner-container {
     margin: 0 auto;
     width: 100%;
+    position: relative;
 }
 
-
 .inner-form {
-    margin: 10px;
+    margin: 20px;
+    position: relative;
 }
 
 .form-control {
@@ -79,10 +84,86 @@ body {
     overflow-y: hidden;
 }
 
-.right {
-    float: right;
+.title {}
+
+.me-container {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
 }
 
-.title {
-    
+.me-container i {
+    font-size: 26px;
+}
+
+.me-button {
+    color: #337ab7;
+    background: white;
+    border: 1px solid #dddddd;
+}
+
+.me-button:hover, .me-button:focus {
+    color: #23527c;
+    text-decoration: none;
+}
+
+.username-text {
+    margin-top: 5px;
+    margin-right: 8px;
+    float: left;
+}
+
+.results-table {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.results-table table {
+    width: 100%;
+    border: none;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#title-row {
+    background-color: #d3d3d3;
+}
+
+.result-row {
+    cursor: pointer;
+}
+
+h2 {
+    margin-top: 10px;
+}
+
+.results-table>.table-hover>tbody>tr:hover {
+    background-color: #d3d3d3;
+}
+
+.detail-key {
+    text-align: right;
+}
+
+.detail-info table {
+    margin-bottom: 0;
+}
+
+.detail-value-list p {
+    margin: 0;
+}
+
+.edit-profile-button {
+    margin-bottom: 10px;
+}
+
+.table > tbody > tr > .detail-key-edit  {
+    vertical-align: middle;
+}
+
+.profile-field {
+    margin-bottom: 0;
 }

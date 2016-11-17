@@ -1,5 +1,5 @@
 define(['./module'], function (controllers) {
-    controllers.controller('RegisterController', function($scope, $state, API) {
+    controllers.controller('RegisterController', function($scope, $state, API, User) {
         $scope.successMessage = '';
         $scope.successClass = '';
         $scope.credentials = {
@@ -15,6 +15,9 @@ define(['./module'], function (controllers) {
             API.register(credentials).then(function(res) {
                 $scope.successMessage = 'New user successfully created.';
                 $scope.successClass = 'alert alert-success';
+                User.setUser({
+                    Username: credentials.username
+                });
                 $state.go('main');
             }, function (err) {
                 $scope.successMessage = 'Failed to create new user.';

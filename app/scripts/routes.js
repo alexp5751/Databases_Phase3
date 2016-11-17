@@ -1,4 +1,4 @@
-define(['app'], function (app) {
+define(['app'], function(app) {
     return app.config(function($urlRouterProvider, $stateProvider) {
         $urlRouterProvider.otherwise('/login');
         $stateProvider.state('login', {
@@ -16,11 +16,11 @@ define(['app'], function (app) {
         }).state('my_applications', {
             url: '/my_applications',
             templateUrl: 'partials/my_applications.html'
-        }).state('project_details', {
-            url: '/project_details',
+        }).state('project', {
+            url: '/project/:projectName',
             templateUrl: 'partials/project_details.html'
-        }).state('course_details', {
-            url: '/course_details',
+        }).state('course', {
+            url: '/course/:courseName',
             templateUrl: 'partials/course_details.html'
         }).state('edit_profile', {
             url: '/edit_profile',
