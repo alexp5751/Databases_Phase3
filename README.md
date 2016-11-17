@@ -9,7 +9,7 @@
 7. In a separate terminal (leave the one running `http-server` alone, as you'll want to be able to view the site and access the database), navigate to the server folder inside the Team78_Phase3 repository.
 8. Run `npm install` to install all dependencies for our server. This includes `mysql` (duh), `express` (allows us to create the REST API), and `body-parser` (allows for parsing of data in requests and responses for the API).
 9. Once that finishes, run `node server.js`. This should print a single line about listening on a specific port, but it doesn't matter all that much.
-10. Once again, test the app at <http://localhost:8080>. This time, things that are connected to the database should function properly (which is currently only login and register).
+10. Once again, test the app at <http://localhost:8080>. This time, things that are connected to the database should function properly.
 11. Do a jig.
 12. Stay in school, kids.
 13. Winning.
