@@ -25,6 +25,24 @@ define(['app'], function(app) {
         }).state('edit_profile', {
             url: '/edit_profile',
             templateUrl: 'partials/edit_profile.html'
+        }).state('admin_main', {
+            url: '/admin',
+            templateUrl: 'partials/admin_main.html'
+        }).state('all_applications', {
+            url: '/admin/all-applications',
+            templateUrl: 'partials/all_applications.html'
+        }).state('popular_projects_report', {
+            url: '/admin/popular-projects-report',
+            templateUrl: 'partials/popular_projects_report.html'
+        }).state('application_report', {
+            url: '/admin/application-report',
+            templateUrl: 'partials/application_report.html'
+        }).state('add_project', {
+            url: '/admin/add_project',
+            templateUrl: 'partials/add_project.html'
+        }).state('add_course', {
+            url: '/admin/add_course',
+            templateUrl: 'partials/add_course.html'
         });
     });
 });

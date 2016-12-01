@@ -6,12 +6,76 @@ define(['./module'], function(controllers) {
             $scope.username = User.getUser().Username;
         }
 
-        API.getProjectsAndCourses().then(function(res) {
+        $scope.params = {};
+        $scope.params.categories = [];
+        $scope.categoryOptions = [
+            {
+                index: 0,
+                name: 'Category 1'
+            }
+        ];
+
+        API.queryProjectsAndCourses({}).then(function(res) {
             $scope.items = res.data;
         });
 
-        $scope.getState = function(name, type) {
-            return '/' + type.toLowerCase() + '/' + name;
+        API.getDesignations().then(function(res) {
+            console.log(res.data)
+            $scope.designations = res.data;
+        });
+
+        API.getMajors().then(function(res) {
+            $scope.majors = res.data;
+        });
+
+        API.getCategories().then(function(res) {
+            $scope.categories = res.data;
+        });
+
+        $scope.years = [
+            'Senior',
+            'Junior',
+            'Sophomore',
+            'Freshman'
+        ]
+
+        $scope.addCategory = function() {
+            $scope.categoryOptions.push({
+                index: $scope.categoryOptions.length,
+                name: 'Category ' + ($scope.categoryOptions.length + 1)
+            });
+        }
+
+        $scope.removeCategory = function() {
+            if ($scope.categoryOptions.length > 1) {
+                $scope.categoryOptions.splice($scope.categoryOptions.length - 1, 1);
+                if ($scope.params.categories[$scope.params.categories.length - 1]) {
+                    $scope.params.categories.splice($scope.params.categories.length - 1, 1);
+                }
+            }
+        }
+
+        $scope.search = function(params) {
+            if (params.categories.length == 0) {
+                delete params.categories;
+            }
+            console.log(params);
+            API.queryProjectsAndCourses(params).then(function(res) {
+                $scope.items = res.data;
+                if (!params['categories']) {
+                    params.categories = []
+                }
+            });
+        }
+
+        $scope.reset = function() {
+            $scope.params = {
+                'categories': []
+            };
+            $scope.categoryOptions = [{
+                index: 0,
+                name: 'Category 1'
+            }];
         }
     });
 });

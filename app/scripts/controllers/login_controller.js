@@ -16,11 +16,18 @@ define(['./module'], function (controllers) {
                 User.setUser({
                     Username: credentials.username
                 });
-                $state.go('main');
+                if (res.data[0].UserType == 'Admin') {
+                    $state.go('admin_main')
+                } else {
+                    $state.go('main');
+                }
             }, function (err) {
                 if (err.status == 401) {
                     $scope.authClass = 'alert alert-danger';
                     $scope.authMessage = 'Username or password incorrect.';
+                } else {
+                    $scope.authClass = 'alert alert-danger';
+                    $scope.authMessage = 'Something went wrong...';
                 }
             });
         }

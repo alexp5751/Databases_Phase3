@@ -32,6 +32,7 @@
                 </tbody>
             </table>
             <button class="btn btn-default full-width" type="submit">Edit Profile</button>
+            <p ng-show="message" class="{{ messageClass }}" style="margin-top: 10px">{{ message }}</p>
         </div>
         <div class="return-link-container">
             <a class="return-link" ui-sref="me">Return to {{username}}'s Page</a>

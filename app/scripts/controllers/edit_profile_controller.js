@@ -6,6 +6,9 @@ define(['./module'], function(controllers) {
             $scope.username = User.getUser().Username;
         }
 
+        $scope.messageClass = '';
+        $scope.message = '';
+
         API.getMajors().then(function(res) {
             $scope.majors = res.data;
         });
@@ -22,8 +25,14 @@ define(['./module'], function(controllers) {
         }
 
         $scope.editProfile = function() {
+            $scope.messageClass = 'alert alert-warning';
+            $scope.message = 'Attempting to edit user...';
             API.updateUser($scope.user).then(function(res) {
-                // Give visual feedback
+                $scope.messageClass = 'alert alert-success';
+                $scope.message = 'Successfully updated user.';
+            }, function(error) {
+                $scope.messageClass = 'alert alert-danger';
+                $scope.message = 'Failed to update user.';
             });
         }
     });

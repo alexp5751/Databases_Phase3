@@ -1,17 +1,9 @@
-html, body {
-    height: 100%;
-}
-
 body {
     background: url(/images/background.jpg) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
-}
-
-#main-container {
-    height: 100%;
 }
 
 #view {
@@ -36,7 +28,8 @@ body {
 .lg-inner-container {
     margin: 0 auto;
     width: 100%;
-    position: relative;
+    position: absolute;
+    top: 0;
 }
 
 .inner-form {
@@ -156,7 +149,7 @@ h2 {
     margin: 0;
 }
 
-.edit-profile-button {
+.stack, .edit-profile-button {
     margin-bottom: 10px;
 }
 
@@ -185,4 +178,21 @@ h2 {
 hr {
     margin: 0;
     border-color: #ddd;
+}
+
+table .form-control {
+    margin: 0;
+}
+
+.param {
+    text-align: right;
+    vertical-align: middle !important;
+}
+
+.params {
+    margin-bottom: 10px;
+}
+
+.search-btn {
+    margin-top: 10px;
 }

@@ -15,6 +15,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+// Retrieve all users
 app.get('/users', function(req, res) {
     db.safe_query('SELECT * FROM User', function(err, result) {
         if (err) {
@@ -25,6 +26,7 @@ app.get('/users', function(req, res) {
     });
 });
 
+// Retrieve a user based on a username
 app.get('/user/:username', function(req, res) {
     db.safe_query('SELECT * FROM User WHERE Username = ?', [req.params.username], function(err, result) {
         if (err) {
@@ -35,6 +37,7 @@ app.get('/user/:username', function(req, res) {
     });
 });
 
+// Retrieve a user based on their email
 app.get('/user/email/:email', function(req, res) {
     db.safe_query('SELECT * FROM User WHERE GTEmail = ?', [req.params.email], function(err, result) {
         if (err) {
@@ -45,6 +48,7 @@ app.get('/user/email/:email', function(req, res) {
     });
 });
 
+// Post login credentails, return success: true if valid, 401 error if not
 app.post('/user/login', function(req, res) {
     db.safe_query('SELECT * FROM User WHERE Username = ? AND Password = ?', [req.body.Username, req.body.Password], function(err, result) {
         if (err) {
@@ -61,6 +65,7 @@ app.post('/user/login', function(req, res) {
     });
 });
 
+// Update a user's information with valid post information, 400 if not valid
 app.post('/user/edit', function(req, res) {
     db.safe_query('UPDATE User SET ? WHERE Username = ?', [req.body, req.body.Username], function(err, result) {
         if (err) {
@@ -73,6 +78,7 @@ app.post('/user/edit', function(req, res) {
     });
 });
 
+// Create a new user with valid post information, 409 if duplicate, 400 if not valid
 app.post('/user/create', function(req, res) {
     db.safe_query('INSERT INTO User SET ?', req.body, function(err, result) {
         if (err && err.errno == 1062) {
@@ -87,6 +93,7 @@ app.post('/user/create', function(req, res) {
     });
 });
 
+// Get all projects
 app.get('/projects', function(req, res) {
     db.safe_query('SELECT * FROM Project', function(err, result) {
         if (err) {
@@ -97,6 +104,7 @@ app.get('/projects', function(req, res) {
     });
 });
 
+// Get specific project by project name
 app.get('/project/:name', function(req, res) {
     db.safe_query('SELECT * FROM Project WHERE ProjectName = ?', [req.params.name], function(err, result) {
         if (err) {
@@ -107,6 +115,8 @@ app.get('/project/:name', function(req, res) {
     });
 });
 
+
+// Get all courses
 app.get('/courses', function(req, res) {
     db.safe_query('SELECT * FROM Course', function(err, result) {
         if (err) {
@@ -117,6 +127,7 @@ app.get('/courses', function(req, res) {
     });
 });
 
+// Get specific course with CourseName
 app.get('/course/:name', function(req, res) {
     db.safe_query('SELECT * FROM Course WHERE CourseName = ?', [req.params.name], function(err, result) {
         if (err) {
@@ -127,6 +138,7 @@ app.get('/course/:name', function(req, res) {
     });
 });
 
+// Get specific course by it's CourseNumber
 app.get('/course/number/:number', function(req, res) {
     db.safe_query('SELECT * FROM Course WHERE CourseNumber = ?', [req.params.number], function(err, result) {
         if (err) {
@@ -137,6 +149,7 @@ app.get('/course/number/:number', function(req, res) {
     });
 });
 
+// Create a new project with valid post information, 409 if duplicate, 400 if not valid
 app.post('/project/create', function(req, res) {
     db.safe_query('INSERT INTO Project SET ?', req.body, function(err, result) {
         if (err && err.errno == 1062) {
@@ -151,6 +164,7 @@ app.post('/project/create', function(req, res) {
     });
 });
 
+// Create a new course with valid post information, 409 if duplicate, 400 if not valid
 app.post('/course/create', function(req, res) {
     db.safe_query('INSERT INTO Course SET ?', req.body, function(err, result) {
         if (err && err.errno == 1062) {
@@ -165,6 +179,7 @@ app.post('/course/create', function(req, res) {
     });
 });
 
+// Get all projects and courses as a list of tuples with their name (ProjectName or CourseName as Name) and new field "Type"
 app.get('/projects/courses', function(req, res) {
     var designation = req.query.designation || '%';
     var major = req.query.major || '%';
@@ -182,8 +197,9 @@ app.get('/projects/courses', function(req, res) {
         });
 });
 
+// Get all designations ordered by name for convenience
 app.get('/designations', function(req, res) {
-    db.safe_query('SELECT * FROM Designation', function(err, result) {
+    db.safe_query('SELECT * FROM Designation ORDER BY Name', function(err, result) {
         if (err) {
             res.status(400).send(err);
         } else {
@@ -192,6 +208,7 @@ app.get('/designations', function(req, res) {
     });
 });
 
+// Get all majors ordered by name for convenience
 app.get('/majors', function(req, res) {
     db.safe_query('SELECT * FROM Major ORDER BY MajorName', function(err, result) {
         if (err) {
@@ -202,6 +219,18 @@ app.get('/majors', function(req, res) {
     });
 });
 
+// Get all categories ordered by name for convenience
+app.get('/categories', function(req, res) {
+    db.safe_query('SELECT * FROM Category ORDER BY CategoryName', function(err, result) {
+        if (err) {
+            res.status(400).send(err);
+        } else {
+            res.send(result);
+        }
+    });
+});
+
+// Get a department based on a specific major name
 app.get('/department/:majorName', function(req, res) {
     db.safe_query('SELECT DeptName FROM Major WHERE MajorName = ?', [req.params.majorName], function(err, result) {
         if (err) {
@@ -212,6 +241,7 @@ app.get('/department/:majorName', function(req, res) {
     });
 });
 
+// Get a specific course's categories
 app.get('/course/categories/:courseNumber', function(req, res) {
     db.safe_query('SELECT CategoryName FROM CourseCategory WHERE CourseNumber = ?', [req.params.courseNumber], function(err, result) {
         if (err) {
@@ -222,6 +252,7 @@ app.get('/course/categories/:courseNumber', function(req, res) {
     });
 });
 
+// Get a specific Project's categories
 app.get('/project/categories/:projectName', function(req, res) {
     db.safe_query('SELECT CategoryName FROM ProjectCategory WHERE ProjectName = ?', [req.params.projectName], function(err, result) {
         if (err) {
@@ -232,6 +263,7 @@ app.get('/project/categories/:projectName', function(req, res) {
     });
 });
 
+// Get a specific project's requirements
 app.get('/project/requirements/:projectName', function(req, res) {
     db.safe_query('SELECT Requirement FROM Requirement WHERE ProjectName = ?', [req.params.projectName], function(err, result) {
         if (err) {
@@ -242,6 +274,7 @@ app.get('/project/requirements/:projectName', function(req, res) {
     });
 });
 
+// Create an application with valid post information, 409 if duplicate, 400 if invalid
 app.post('/application/create', function(req, res) {
     db.safe_query('INSERT INTO Application SET ?', req.body, function(err, result) {
         if (err && err.errno == 1062) {
@@ -256,6 +289,7 @@ app.post('/application/create', function(req, res) {
     });
 });
 
+// Get all applications for a specific Username
 app.get('/application/:username', function(req, res) {
     db.safe_query('SELECT * FROM Application WHERE Username = ?', [req.params.username], function(err, result) {
         if (err) {
@@ -266,6 +300,7 @@ app.get('/application/:username', function(req, res) {
     });
 });
 
+// Get a single application with Username and ProjectName
 app.get('/application/:username/:projectName', function(req, res) {
     db.safe_query('SELECT * FROM Application WHERE Username = ? AND ProjectName = ?', [req.params.username, req.params.projectName], function(err, result) {
         if (err) {

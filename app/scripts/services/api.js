@@ -35,6 +35,7 @@ define(['./module'], function(services) {
                 }).then(function(res) {
                     def.resolve(res);
                 }, function(err) {
+                    console.log(err)
                     def.reject(err);
                 });
                 return def.promise;
@@ -55,7 +56,7 @@ define(['./module'], function(services) {
             },
             updateUser: function(user) {
                 var def = $q.defer();
-                $http.post('http://localhost:8000/user/edit', user).then(function(res) {
+                $http.post('http://localhost:8000/user/' + user.Username + '/edit', user).then(function(res) {
                     def.resolve(res);
                 }, function(err) {
                     def.reject(err);
@@ -80,9 +81,9 @@ define(['./module'], function(services) {
                 });
                 return def.promise;
             },
-            getProjectsAndCourses: function() {
+            queryProjectsAndCourses: function(params) {
                 var def = $q.defer();
-                $http.get('http://localhost:8000/projects/courses').then(function(res) {
+                $http.post('http://localhost:8000/projects/courses', params).then(function(res) {
                     def.resolve(res);
                 }, function(err) {
                     def.reject(err);
@@ -183,7 +184,55 @@ define(['./module'], function(services) {
                     def.reject(err);
                 });
                 return def.promise;
+            },
+            getDesignations: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/designations').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getCategories: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/categories').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getApplications: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/applications').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            updateApplication: function(username, projectName, status) {
+                var def = $q.defer();
+                $http.post('http://localhost:8000/application/' + username + '/' + projectName, {
+                    'Status': status
+                }).then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getProjectsByNumApplicants: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/projects/applicants').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
             }
+
         }
     });
 })

@@ -12,7 +12,7 @@ define(['./module'], function(controllers) {
 
         var name = $stateParams.projectName;
         API.getProjectByName(name).then(function(res) {
-            if (res.data.length > 0) {
+            if (res.data) {
                 $scope.project = res.data[0];
 
                 API.getProjectCategories(name).then(function(res) {
@@ -21,6 +21,12 @@ define(['./module'], function(controllers) {
 
                 API.getProjectRequirements(name).then(function(res) {
                     $scope.project.Requirements = res.data;
+                });
+
+                API.getUserByUsername($scope.username).then(function(res) {
+                    if (res.data[0].Major == null || res.data[0].Year == null) {
+                        $scope.undeclared = true;
+                    }
                 });
 
                 API.getApplicationByUsernameAndProjectName($scope.username, name).then(function(res) {
@@ -45,8 +51,8 @@ define(['./module'], function(controllers) {
                 if (err.status == 409) {
                     $scope.successMessage = 'You have already applied to this project.';
                     $scope.successClass = 'alert alert-danger';
-                } else {
-                    $scope.successMessage = 'Failed to apply for project.';
+                } else if (err.status == 401) {
+                    $scope.successMessage = 'You do not meet this project\'s requirements.';
                     $scope.successClass = 'alert alert-danger';
                 }
             });
