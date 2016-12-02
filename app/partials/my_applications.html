@@ -10,7 +10,7 @@
                         <th>Status</th>
                     </tr>
                     <tr ng-repeat="application in applications" ng-class="{'table-success': application.Status == 'Accepted','table-warning': application.Status == 'Pending','table-danger': application.Status == 'Rejected'}">
-                        <td>{{ getDate(application.Date) }}</td>
+                        <td>{{ application.Date.split(' ').splice(0, 4).join(' ') }}</td>
                         <td>{{ application.ProjectName }}</td>
                         <td ng-class="{'bg-success': application.Status == 'Accepted','bg-warning': application.Status == 'Pending','bg-danger': application.Status == 'Rejected'}">{{ application.Status }}</td>
                     </tr>

@@ -9,5 +9,8 @@ define([
     './my_applications_controller',
     './admin_controller',
     './all_applications_controller',
-    './popular_projects_controller'
+    './popular_projects_controller',
+    './applications_report_controller',
+    './add_project_controller',
+    './add_course_controller'
 ], function () {});

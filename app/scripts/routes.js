@@ -36,7 +36,7 @@ define(['app'], function(app) {
             templateUrl: 'partials/popular_projects_report.html'
         }).state('application_report', {
             url: '/admin/application-report',
-            templateUrl: 'partials/application_report.html'
+            templateUrl: 'partials/applications_report.html'
         }).state('add_project', {
             url: '/admin/add_project',
             templateUrl: 'partials/add_project.html'

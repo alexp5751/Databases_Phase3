@@ -231,8 +231,52 @@ define(['./module'], function(services) {
                     def.reject(err);
                 });
                 return def.promise;
+            },
+            getApplicationsReport: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/applications/report').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getTotalApplications: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/applications/total').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            getDepartments: function() {
+                var def = $q.defer();
+                $http.get('http://localhost:8000/departments').then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            createProject: function(project) {
+                var def = $q.defer();
+                $http.post('http://localhost:8000/project/create', project).then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
+            },
+            createCourse: function(course) {
+                var def = $q.defer();
+                $http.post('http://localhost:8000/course/create', course).then(function(res) {
+                    def.resolve(res);
+                }, function(err) {
+                    def.reject(err);
+                });
+                return def.promise;
             }
-
         }
     });
 })

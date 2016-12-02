@@ -15,7 +15,7 @@
                         <td ng-click="allowFeedback(item)">{{ item.ProjectName }}</td>
                         <td>{{ item.Major }}</td>
                         <td>{{ item.Year }}</td>
-                        <td>{{ item.Status }}</td>
+                        <td ng-class="{'bg-success': item.Status == 'Accepted','bg-warning': item.Status == 'Pending','bg-danger': item.Status == 'Rejected'}">{{ item.Status }}</td>
                         <td>
                             <button ng-click="accept(item)" ng-show="item.Status=='Pending'" class="btn btn-success full-width" style="margin-bottom: 5px">Accept</button>
                             <button ng-click="reject(item)" ng-show="item.Status=='Pending'" class="btn btn-danger full-width">Reject</button>

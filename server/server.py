@@ -1,5 +1,6 @@
 from flask import Flask, url_for, jsonify, json, request
 from flask_cors import CORS
+import mysql.connector.errors as errors
 from db import Database
 from pprint import pprint
 app = Flask(__name__)
@@ -247,6 +248,14 @@ def get_department_by_major(major_name):
     resp.status_code = 200
     return resp
 
+@app.route('/departments', methods=['GET'])
+def get_departments():
+    sql = "SELECT DeptName FROM Department ORDER BY DeptName"
+    result = db.query(sql)
+    resp = jsonify(result)
+    resp.status_code = 200
+    return resp
+
 @app.route('/course/categories/<course_number>', methods = ['GET'])
 def get_course_categories_by_course_number(course_number):
     sql = "SELECT CategoryName FROM CourseCategory WHERE CourseNumber = '{0}'".format(course_number)
@@ -334,14 +343,27 @@ def apply_for_project():
         INNER JOIN Major AS m ON u.Major = m.MajorName
         WHERE u.Username = @username;
 
-        SELECT COUNT(*) INTO @Requirements FROM Requirement
-        WHERE ProjectName = @projectname;
-
-        SELECT COUNT(*) INTO @FulfilledRequirements FROM Requirement
+        SELECT COUNT(*) INTO @NONMDRequirements FROM Requirement
         WHERE ProjectName = @projectname
-        AND (Requirement LIKE @Major OR Requirement LIKE @Year OR Requirement LIKE @Department);
+        AND RequirementType = 'Year';
 
-        SELECT @Requirements, @FulfilledRequirements, @Requirements = @FulfilledRequirements AS 'AbleToApply';
+        SELECT COUNT(*) INTO @MDRequirements FROM Requirement
+        WHERE ProjectName = @projectname
+        AND (RequirementType = 'Major' OR RequirementType = 'Department');
+
+        SELECT COUNT(*) INTO @FulfilledNONMDRequirements FROM Requirement
+        WHERE ProjectName = @projectname
+        AND RequirementType = 'Year'
+        AND (Requirement LIKE @Year);
+
+        SELECT COUNT(*) INTO @FulfilledMDRequirements FROM Requirement
+        WHERE ProjectName = @projectname
+        AND (RequirementType = 'Major' OR RequirementType = 'Department')
+        AND (Requirement LIKE @Major OR Requirement LIKE @Department);
+
+        SELECT @NONMDRequirements = @FulfilledNONMDRequirements
+        AND (@MDRequirements = @FulfilledMDRequirements
+            OR (@MDRequirements = 2 AND @FulfilledMDRequirements = 1)) AS 'AbleToApply';
     """
     result = db.query(sql, data, multi=True)
     if result[0]['AbleToApply'] == 0:
@@ -355,6 +377,134 @@ def apply_for_project():
     resp.status_code = 200
     return resp
 
+@app.route('/applications/report', methods = ['GET'])
+def get_application_report():
+    sql = """
+        SELECT t1.ProjectName, t1.Applicants, t1.AcceptanceRate, t2.TopMajors FROM (
+            SELECT a.ProjectName, COUNT(*) AS 'Applicants', ROUND(COUNT(CASE WHEN a.Status='Accepted' THEN 1 END) / COUNT(*) * 100) AS 'AcceptanceRate' FROM Application as a
+            GROUP BY a.ProjectName) AS t1
+        INNER JOIN (
+            SELECT a.ProjectName, GROUP_CONCAT(
+                DISTINCT u.Major
+                ORDER BY u.Major ASC
+                SEPARATOR '\n') AS 'TopMajors'
+            FROM Application as a
+            INNER JOIN User as u ON a.Username = u.Username
+            WHERE a.ProjectName IN (SELECT ProjectName FROM Project)
+            GROUP BY a.ProjectName) AS t2
+        ON t1.ProjectName = t2.ProjectName
+        ORDER BY t1.AcceptanceRate DESC
+    """
+    result = db.query(sql, multi=True)
+    resp = jsonify(result)
+    resp.status_code = 200
+    return resp
+
+@app.route('/applications/total', methods= ['GET'])
+def get_total_applicants():
+    sql = """
+        SELECT COUNT(*) AS 'Applications', COUNT(CASE WHEN Status='Accepted' THEN 1 END) AS 'Accepted' FROM Application
+    """
+    result = db.query(sql, multi=True)
+    resp = jsonify(result)
+    resp.status_code = 200
+    return resp
+
+@app.route('/project/create', methods = ['POST'])
+def create_project():
+    data = request.json
+    categories = []
+    if 'categories' in data:
+        categories = data['categories'].values()
+        del data['categories']
+    else:
+        resp = jsonify({'error': 'Not all required fields filled out.'})
+        resp.status_code = 400
+        return resp
+    sql = """INSERT INTO Project (ProjectName, EstNumStudents, AdvisorName, AdvisorEmail, Description, Designation)
+             VALUES (%(ProjectName)s, %(EstNumStudents)s, %(AdvisorName)s, %(AdvisorEmail)s, %(Description)s, %(Designation)s);"""
+
+    for category in list(set(categories)):
+        sql += "INSERT INTO ProjectCategory (ProjectName, CategoryName) VALUES (%(ProjectName)s, '{0}');".format(category)
+
+    if 'Major' in data:
+        sql += "INSERT INTO Requirement (ProjectName, RequirementType, Requirement) VALUES (%(ProjectName)s, 'Major', %(Major)s);"
+    if 'Year' in data:
+        sql += "INSERT INTO Requirement (ProjectName, RequirementType, Requirement) VALUES (%(ProjectName)s, 'Year', %(Year)s);"
+    if 'Department' in data:
+        sql += "INSERT INTO Requirement (ProjectName, RequirementType, Requirement) VALUES (%(ProjectName)s, 'Department', %(Department)s);"
+    try:
+        result = db.query(sql, data, multi="True")
+    except errors.ProgrammingError as e:
+        pprint(e)
+        resp = jsonify({'error': 'Not all required fields filled out.'})
+        resp.status_code = 400
+        return resp
+    except errors.IntegrityError as e:
+        pprint(e)
+        resp = jsonify({'error': 'ProjectName already in database.'})
+        resp.status_code = 409
+        return resp
+    resp = jsonify(result)
+    resp.status_code = 200
+    return resp
+
+@app.route('/course/create', methods = ['POST'])
+def create_course():
+    data = request.json
+    categories = []
+    if 'categories' in data:
+        categories = data['categories'].values()
+        del data['categories']
+    else:
+        resp = jsonify({'error': 'Not all required fields filled out.'})
+        resp.status_code = 400
+        return resp
+    sql = """INSERT INTO Course (CourseNumber, CourseName, EstNumStudents, Instructor, Designation)
+             VALUES (%(CourseNumber)s, %(CourseName)s, %(EstNumStudents)s, %(Instructor)s, %(Designation)s);"""
+
+    for category in list(set(categories)):
+        sql += "INSERT INTO CourseCategory (CourseNumber, CategoryName) VALUES (%(CourseNumber)s, '{0}');".format(category)
+
+    try:
+        result = db.query(sql, data, multi="True")
+    except errors.ProgrammingError as e:
+        pprint(e)
+        resp = jsonify({'error': 'Not all required fields filled out.'})
+        resp.status_code = 400
+        return resp
+    except errors.IntegrityError as e:
+        pprint(e)
+        resp = jsonify({'error': 'CourseName already in database.'})
+        resp.status_code = 409
+        return resp
+    resp = jsonify(result)
+    resp.status_code = 200
+    return resp
+
+@app.route('/user/create', methods = ['POST'])
+def create_user():
+    data = request.json
+    sql = "INSERT INTO User (Username, Password, GTEmail, UserType) VALUES (%(Username)s, %(Password)s, %(GTEmail)s, %(UserType)s)"
+    try:
+        result = db.query(sql, data)
+    except errors.ProgrammingError as e:
+        pprint(e)
+        resp = jsonify({'error': 'Not all required fields filled out.'})
+        resp.status_code = 400
+        return resp
+    except errors.IntegrityError as e:
+        pprint(e)
+        resp = jsonify({'error': 'Username already in database.'})
+        resp.status_code = 409
+        return resp
+    if len(result) > 0:
+        resp = jsonify({'success': True})
+        resp.status_code = 200
+    else:
+        resp = jsonify({'success': False})
+        resp.status_code = 401
+    return resp
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True, threaded=True)

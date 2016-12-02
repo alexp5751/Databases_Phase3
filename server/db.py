@@ -22,10 +22,13 @@ class Database:
         cursor = connection.cursor(dictionary=True)
         pprint(sql)
         pprint(params)
+        result = None
         if multi:
             for line in cursor.execute(sql, params, multi=True):
                 if line.with_rows:
                     result = line.fetchall()
+            if result is None:
+                result = {'success': True}
 
         else:
             cursor.execute(sql, params)

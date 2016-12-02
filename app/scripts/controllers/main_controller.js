@@ -20,7 +20,6 @@ define(['./module'], function(controllers) {
         });
 
         API.getDesignations().then(function(res) {
-            console.log(res.data)
             $scope.designations = res.data;
         });
 
@@ -59,7 +58,6 @@ define(['./module'], function(controllers) {
             if (params.categories.length == 0) {
                 delete params.categories;
             }
-            console.log(params);
             API.queryProjectsAndCourses(params).then(function(res) {
                 $scope.items = res.data;
                 if (!params['categories']) {

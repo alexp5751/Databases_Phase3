@@ -23,6 +23,9 @@ define(['./module'], function(controllers) {
                 if (err.status == 409) {
                     $scope.successMessage = 'User with this username or email already exists.';
                     $scope.successClass = 'alert alert-danger';
+                } else if (err.status == 400) {
+                    $scope.successMessage = 'Failed to create new user. Not all fields filled.';
+                    $scope.successClass = 'alert alert-danger';
                 } else {
                     $scope.successMessage = 'Failed to create new user.';
                     $scope.successClass = 'alert alert-danger';
