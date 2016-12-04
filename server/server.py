@@ -102,114 +102,75 @@ def get_course_by_number(course_number):
 @app.route('/projects/courses', methods = ['POST'])
 def get_projects_and_courses():
     data = request.json
-    pprint(data)
-    projects_only = False
-    if 'major' in data or 'year' in data:
-        projects_only = True
-    if projects_only:
-        sql = "SELECT t.ProjectName AS 'Name', 'Project' AS 'Type' FROM Project AS t"
-        first_where = True
-        if 'major' in data:
-            sql += """ WHERE t.ProjectName IN
-                    (SELECT p1.ProjectName FROM Project AS p1
-                    INNER JOIN Requirement AS r1 ON p1.ProjectName = r1.ProjectName
-                    WHERE (r1.Requirement = '{0}'))""".format(data['major'])
-            first_where = False
-        if 'year' in data:
-            if first_where:
-                sql += " WHERE"
-            else:
-                sql += " AND"
-            sql += """ t.ProjectName IN
-                    (SELECT p2.ProjectName FROM Project AS p2
-                    INNER JOIN Requirement AS r2 ON p2.ProjectName = r2.ProjectName
-                    WHERE (r2.Requirement = '{0}'))""".format(data['year'])
-            first_where = False
-        if 'designation' in data:
-            if first_where:
-                sql += " WHERE"
-            else:
-                sql += " AND"
-            sql += """ t.ProjectName IN
-                    (SELECT p3.ProjectName FROM Project AS p3
-                    WHERE p3.Designation = '{0}')""".format(data['designation'])
-            first_where = False
-        if 'title' in data:
-            if first_where:
-                sql += " WHERE"
-            else:
-                sql += " AND"
-            sql += """ t.ProjectName IN
-                    (SELECT p4.ProjectName FROM Project AS p4
-                    WHERE p4.ProjectName LIKE '%{0}%')""".format(data['title'])
-            first_where = False
-        if 'categories' in data:
-            if first_where:
-                sql += " WHERE"
-            else:
-                sql += " AND"
-            sql += " ("
-            for index, category in enumerate(data['categories']):
-                if index != 0:
-                    sql += ' OR'
-                sql += """ t.ProjectName IN
-                        (SELECT p5.ProjectName From Project AS p5
-                        INNER JOIN ProjectCategory AS c5 ON p5.ProjectName = c5.ProjectName
-                        WHERE (c5.CategoryName = '{0}'))""".format(category)
-            sql += ")"
-
+    title = data['title'] if 'title' in data else None
+    major = data['major'] if 'major' in data else None
+    year = data['year'] if 'year' in data else None
+    designation = data['designation'] if 'designation' in data else None
+    return_projects = data['projects_only'] if 'projects_only' in data else True
+    return_courses = data['courses_only'] if 'courses_only' in data else True
+    categories = list(set(data['categories'])) if 'categories' in data else []
+    categories = ["'" + x + "'" for x in categories]
+    if len(categories) == 0:
+        categories = "''"
+        no_categories = 'TRUE'
     else:
-        project_block = "SELECT p.ProjectName AS Name, 'Project' AS 'Type' FROM Project AS p"
-        course_block = "SELECT c.CourseName AS Name, 'Course' AS 'Type' FROM Course AS c"
-        first_where = True
-        if 'title' in data:
-            project_block += """ WHERE p.ProjectName IN
-                (SELECT p1.ProjectName FROM Project AS p1
-                WHERE p1.ProjectName LIKE '%{0}%')""".format(data['title'])
-            course_block +=  """ WHERE c.CourseName IN
-                (SELECT c1.CourseName FROM Course AS c1
-                WHERE c1.CourseName LIKE '%{0}%')""".format(data['title'])
-            first_where = False
-        if 'designation' in data:
-            if first_where:
-                project_block += " WHERE"
-                course_block += " WHERE"
-            else:
-                project_block += " AND"
-                course_block += " AND"
-            project_block += """ p.ProjectName IN
-                (SELECT p2.ProjectName FROM Project AS p2
-                WHERE p2.Designation = '{0}')""".format(data['designation'])
-            course_block +=  """ c.CourseName IN
-                (SELECT c2.CourseName FROM Course AS c2
-                WHERE c2.Designation = '{0}')""".format(data['designation'])
-            first_where = False
-        if 'categories' in data:
-            if first_where:
-                project_block += " WHERE"
-                course_block += " WHERE"
-            else:
-                project_block += " AND"
-                course_block += " AND"
-            project_block += " ("
-            course_block += " ("
-            for index, category in enumerate(data['categories']):
-                if index != 0:
-                    project_block += ' OR'
-                    course_block += ' OR'
-                project_block += """ p.ProjectName IN
-                        (SELECT p3.ProjectName From Project AS p3
-                        INNER JOIN ProjectCategory AS pc3 ON p3.ProjectName = pc3.ProjectName
-                        WHERE pc3.CategoryName = '{0}')""".format(category)
-                course_block += """ c.CourseName IN
-                        (SELECT c3.CourseName From Course AS c3
-                        INNER JOIN CourseCategory AS cc3 ON c3.CourseNumber = cc3.CourseNumber
-                        WHERE cc3.CategoryName = '{0}')""".format(category)
-            project_block += ")"
-            course_block += ")"
-
-        sql = "SELECT Name, Type FROM (" + project_block + " UNION " + course_block + ") AS t ORDER BY Name"
-    result = db.query(sql)
+        categories = ','.join(categories)
+        no_categories = 'FALSE'
+    pprint(categories)
+    if not return_projects and not return_courses:
+        return_projects = True
+        return_courses = True
+    sql = """
+        SET @Title = %s;
+        SET @Major = %s;
+        SET @Year = %s;
+        SET @Designation = %s;
+        SET @ReturnProjects = %s;
+        SET @ReturnCourses = %s;
+        SELECT DISTINCT t1.ProjectName AS 'Name', 'Project' AS 'Type' FROM (
+            SELECT ProjectName FROM Requirement
+            WHERE MajorRequirement = @Major OR @Major is NULL OR MajorRequirement IS NULL
+            UNION SELECT ProjectName From Requirement
+            WHERE DepartmentRequirement IN (
+                SELECT DeptName FROM Major
+                WHERE MajorName = @Major
+            )) AS t1
+        INNER JOIN (
+            SELECT ProjectName FROM Requirement
+            WHERE YearRequirement = @Year OR @Year IS NULL OR YearRequirement IS NULL) AS t2
+        ON t1.ProjectName = t2.ProjectName
+        INNER JOIN (
+            SELECT ProjectName FROM Project
+            WHERE ProjectName LIKE CONCAT('%', @Title, '%') OR @Title IS NULL) AS t3
+        ON t1.ProjectName = t3.ProjectName
+        INNER JOIN (
+            SELECT ProjectName FROM ProjectCategory
+            WHERE CategoryName IN ({0})
+            OR {1} = TRUE) AS t4
+        ON t1.ProjectName = t4.ProjectName
+        INNER JOIN (
+            SELECT ProjectName FROM Project
+            WHERE Designation = @Designation OR @Designation IS NULL) AS t5
+        ON t1.ProjectName = t5.ProjectName
+        WHERE @ReturnProjects = TRUE
+        UNION SELECT DISTINCT c1.CourseName AS 'Name', 'Course' AS 'Type' FROM (
+            SELECT CourseName FROM Course
+            WHERE CourseName LIKE CONCAT('%', @Title, '%') OR @Title IS NULL) AS c1
+        INNER JOIN (
+            SELECT CourseName FROM Course
+            WHERE Designation = @Designation OR @Designation IS NULL) AS c2
+        ON c1.CourseName = c2.CourseName
+        INNER JOIN (
+            SELECT CourseName FROM CourseCategory
+            INNER JOIN Course ON Course.CourseNumber = CourseCategory.CourseNumber
+            WHERE CategoryName IN ({0})
+            OR {1} = TRUE) AS c3
+        ON c1.CourseName = c3.CourseName
+        WHERE @ReturnCourses = TRUE
+        ORDER BY Name
+    """.format(categories, no_categories)
+    pprint(sql)
+    result = db.query(sql, (title, major, year, designation, return_projects, return_courses), multi=True)
     resp = jsonify(result)
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.headers.add('Access-Control-Allow-Methods', '*')
@@ -274,8 +235,14 @@ def get_project_categories_by_project_name(project_name):
 
 @app.route('/project/requirements/<project_name>', methods = ['GET'])
 def get_requirements_by_project_name(project_name):
-    sql = "SELECT Requirement FROM Requirement WHERE ProjectName = '{0}'".format(project_name)
-    result = db.query(sql)
+    sql = """
+        SELECT MajorRequirement AS 'Requirement' FROM Requirement WHERE ProjectName = %s
+        UNION
+        SELECT YearRequirement AS 'Requirement' FROM Requirement WHERE ProjectName = %s
+        UNION
+        SELECT DepartmentRequirement AS 'Requirement' FROM Requirement WHERE ProjectName = %s
+    """
+    result = db.query(sql, (project_name, project_name, project_name))
     resp = jsonify(result)
     resp.status_code = 200
     return resp
@@ -343,27 +310,11 @@ def apply_for_project():
         INNER JOIN Major AS m ON u.Major = m.MajorName
         WHERE u.Username = @username;
 
-        SELECT COUNT(*) INTO @NONMDRequirements FROM Requirement
-        WHERE ProjectName = @projectname
-        AND RequirementType = 'Year';
+        SELECT p.MajorRequirement, p.YearRequirement, p.DepartmentRequirement INTO @rMajor, @rYear, @rDepartment FROM Requirement AS p
+        WHERE p.ProjectName = @projectname;
 
-        SELECT COUNT(*) INTO @MDRequirements FROM Requirement
-        WHERE ProjectName = @projectname
-        AND (RequirementType = 'Major' OR RequirementType = 'Department');
-
-        SELECT COUNT(*) INTO @FulfilledNONMDRequirements FROM Requirement
-        WHERE ProjectName = @projectname
-        AND RequirementType = 'Year'
-        AND (Requirement LIKE @Year);
-
-        SELECT COUNT(*) INTO @FulfilledMDRequirements FROM Requirement
-        WHERE ProjectName = @projectname
-        AND (RequirementType = 'Major' OR RequirementType = 'Department')
-        AND (Requirement LIKE @Major OR Requirement LIKE @Department);
-
-        SELECT @NONMDRequirements = @FulfilledNONMDRequirements
-        AND (@MDRequirements = @FulfilledMDRequirements
-            OR (@MDRequirements = 2 AND @FulfilledMDRequirements = 1)) AS 'AbleToApply';
+        SELECT ((@rMajor IS NULL AND @rDepartment IS NULL) OR (@Major = @rMajor OR @Department = @rDepartment))
+        AND (@rYear IS NULL OR @rYear = @Year) AS 'AbleToApply'
     """
     result = db.query(sql, data, multi=True)
     if result[0]['AbleToApply'] == 0:
@@ -423,16 +374,14 @@ def create_project():
         return resp
     sql = """INSERT INTO Project (ProjectName, EstNumStudents, AdvisorName, AdvisorEmail, Description, Designation)
              VALUES (%(ProjectName)s, %(EstNumStudents)s, %(AdvisorName)s, %(AdvisorEmail)s, %(Description)s, %(Designation)s);"""
-
     for category in list(set(categories)):
         sql += "INSERT INTO ProjectCategory (ProjectName, CategoryName) VALUES (%(ProjectName)s, '{0}');".format(category)
 
-    if 'Major' in data:
-        sql += "INSERT INTO Requirement (ProjectName, RequirementType, Requirement) VALUES (%(ProjectName)s, 'Major', %(Major)s);"
-    if 'Year' in data:
-        sql += "INSERT INTO Requirement (ProjectName, RequirementType, Requirement) VALUES (%(ProjectName)s, 'Year', %(Year)s);"
-    if 'Department' in data:
-        sql += "INSERT INTO Requirement (ProjectName, RequirementType, Requirement) VALUES (%(ProjectName)s, 'Department', %(Department)s);"
+    requirement_data = ['Major', 'Year', 'Department']
+    for req in requirement_data:
+        if req not in data:
+            data[req] = None
+    sql += "INSERT INTO Requirement (ProjectName, MajorRequirement, YearRequirement, DepartmentRequirement) VALUES (%(ProjectName)s, %(Major)s, %(Year)s, %(Department)s);"
     try:
         result = db.query(sql, data, multi="True")
     except errors.ProgrammingError as e:

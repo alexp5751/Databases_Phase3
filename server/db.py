@@ -20,7 +20,6 @@ class Database:
     def query(self, sql, params=None, multi=False):
         connection = self.pool.get_connection()
         cursor = connection.cursor(dictionary=True)
-        pprint(sql)
         pprint(params)
         result = None
         if multi:

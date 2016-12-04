@@ -6,7 +6,10 @@ define(['./module'], function(controllers) {
             $scope.username = User.getUser().Username;
         }
 
-        $scope.params = {};
+        $scope.params = {
+            'projects_only': false,
+            'courses_only': false
+        };
         $scope.params.categories = [];
         $scope.categoryOptions = [
             {
@@ -55,6 +58,7 @@ define(['./module'], function(controllers) {
         }
 
         $scope.search = function(params) {
+            console.log(params);
             if (params.categories.length == 0) {
                 delete params.categories;
             }
@@ -68,7 +72,9 @@ define(['./module'], function(controllers) {
 
         $scope.reset = function() {
             $scope.params = {
-                'categories': []
+                'categories': [],
+                'projects_only': false,
+                'courses_only': false
             };
             $scope.categoryOptions = [{
                 index: 0,

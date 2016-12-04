@@ -59,6 +59,16 @@
                 <button type="button" class="full-width btn btn-default" ng-click="removeCategory()">Remove Category</button>
             </div>
             <div class="col-xs-6">
+                <div class="checkbox" style="text-align: center">
+                    <label><input type="checkbox" value="checked" ng-model="params.projects_only" checked>Projects</label>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="checkbox" style="text-align: center">
+                    <label><input type="checkbox" value="checked" ng-model="params.courses_only" checked>Courses</label>
+                </div>
+            </div>
+            <div class="col-xs-6">
                 <button type="submit" class="search-btn full-width btn btn-success">Search</button>
             </div>
             <div class="col-xs-6">
